@@ -13,6 +13,7 @@
 # how to :
  
  [2]- press and hold LEFT MOUSE BUTTON and drag to DRAW WALLS
+ 
       press and hold RIGHT MOUSE BUTTON and drag to REMOVE WALLS
      
  [3]- set SOURCE(starting point)
