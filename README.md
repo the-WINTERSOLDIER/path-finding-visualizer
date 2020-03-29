@@ -12,14 +12,14 @@
   
 # how to :
  
- [2]- press and hold LEFT MOUSE BUTTON and drag to DRAW WALLS
+    press key [2] then press and hold LEFT MOUSE BUTTON and drag to DRAW WALLS
  
-      press and hold RIGHT MOUSE BUTTON and drag to REMOVE WALLS
+ 	press key [2] then npress and hold RIGHT MOUSE BUTTON and drag to REMOVE WALLS
      
- [3]- set SOURCE(starting point)
+ 	press key [3]- set SOURCE(starting point)
  
- [4]- set DESTINATION point
+  	press key [4]- set DESTINATION point
  
- [5]- RESET SOURCE
+  	press key [5]- RESET SOURCE
  
- [6]-RESET DESTINATION POINT
+  	press key [6]-RESET DESTINATION POINT
