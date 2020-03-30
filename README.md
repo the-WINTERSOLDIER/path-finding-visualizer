@@ -27,4 +27,4 @@
     press key[1] to find shortest path
     
 # SCREENSHOTS  
-    ![Image description](screenshot/maze.png)
+    ![Image description]screenshot/maze.png
