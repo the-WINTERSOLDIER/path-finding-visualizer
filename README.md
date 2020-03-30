@@ -25,3 +25,6 @@
   	press key [6] RESET DESTINATION POINT
   
     press key[1] to find shortest path
+    
+# SCREENSHOTS  
+    ![Image description](screenshot/maze.png)
