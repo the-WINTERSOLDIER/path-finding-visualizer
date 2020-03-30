@@ -27,4 +27,4 @@
     press key[1] to find shortest path
     
 # SCREENSHOTS  
-    ![Image description] /screenshot/maze.png
+    ![SCREENSHOT1] https://github.com/hemanshukhilari/path-finding-visualizer/blob/master/screenshot/maze.png
