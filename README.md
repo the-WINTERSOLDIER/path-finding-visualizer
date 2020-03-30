@@ -23,3 +23,5 @@
   	press key [5]  RESET SOURCE
  
   	press key [6] RESET DESTINATION POINT
+  
+    press key[1] to find shortest path
