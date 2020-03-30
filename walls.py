@@ -1,5 +1,5 @@
 import pygame
-
+from collections import deque #used for queue
 pygame.init()
 #--------------------------------------------
 
@@ -7,27 +7,35 @@ pygame.init()
 screen_size=(WIDTH,HEIGHT)=(800,800)
 BGCOLOUR=( 255 , 255 , 255)
 
+
+#SETTING UP THE SCREEN
 screen=pygame.display.set_mode(screen_size)
 rekt=(50,50,WIDTH-100,HEIGHT-100)
+
 screen.fill((255,255,255))#white color of the screen
-screen.fill((71, 0, 156),rekt)
-
-
+screen.fill((71, 0, 156),rekt)#voilet cor of the screeen
+pressed=False
+wall=[]
 pygame.display.update()
-
+#_________________________________________________________
 class cell (object):
 	def __init__(self,cell_size,color,pos):
 		self.cell_size=cell_size
 		self.color=color
 		self.pos=pos
 		self.rekt=(pos[0],pos[1],self.cell_size,self.cell_size)
-		self.is_src=False
-		self.is_dest=False
-		self.is_wall=False
-		
+		self.is_src=False #set the flag if the cell obj is  SOURCE
+		self.is_dest=False#set the flag if the cell obj is DESTINATION
+		self.is_wall=False#sel if the flag is cell obj is WALL
+		#________________variables used by path finding algos________________________
+		self.parent=(0,0)
+		self.visited=False #set if the cell is visited
+		self.dist=0#dist from SOURCE cell
+		#_______________________________________________________________________
 	def change_cell_color(self,color):
 		self.color=color
 	def draw(self,SCREEN,color=[71,0,156]):
+		self.color=color
 		SCREEN.fill(color,self.rekt)		
 		pygame.display.update(self.rekt)
 		
@@ -37,8 +45,9 @@ class Grid (object):
 	dest_set=False
 	dest=(0,0)#cell coordinates of source and destination
 	src=(0,0)
-	erectwall=False
-	breakwall=False
+	erectwall=False #flsg that allows to to build wall
+	breakwall=False#flag that allows to break walls
+	
 	def __init__(self,rows,cols,cell_size,x,y,color=[71,0,156]):
 		self.xcount=rows
 		self.ycount=cols
@@ -60,16 +69,62 @@ class Grid (object):
 		#print(self.dest,"\nsrc_set?",self.dest_set)
 		self.dest_set=False
 		self.grid [ self.dest[0] ] [ self.dest[1] ].draw(screen)
-		self.dest=(0,0)	
+		self.dest=(0,0)
+	def reset(self):
+		pass	
 
 MAZE=Grid(50,50,14,50,50)
 
+def isvalid(cell_coord):
+	if(cell_coord [  0 ]  >= 0 and cell_coord [  0 ]  < 50 and cell_coord [ 1 ] >=0 and cell_coord [  1 ]  <50 and not MAZE.grid[ cell_coord [  0 ]   ][ cell_coord [  1  ]   ].is_wall):
+		return True
+	return False
 	
+def BFS(maze):
+	maze.grid [ maze.src[0] ] [ maze.src[1] ].dist=0
+	maze.grid [ maze.src[0] ] [ maze.src[1] ].visited=True #set the SOURCE  CELL  as VISITED
+	maze.grid[ maze.src[0] ][ maze.src[1] ].parent=(-1,-1)#set the PARENT of the  SOURE CELL as (-1,-1)
+	
+	visited_cell_color=[184,255,99]
+	
+	q=deque() #queue maintains the vertices whose adjacent vertives are yet to be explored
+	q.append(maze.src)
+	
+	3114
+	adj=[(0,-1),(1,0),(0,1),(-1,0)] 
+	while(len(q)!=0):
+		current_cell=q.popleft();
+		for i in adj:
+			neighbour=(  current_cell [ 0 ] + i[0] , current_cell [ 1 ] + i [ 1 ] )
+			if( isvalid( neighbour ) and not  maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].visited ):
+				if neighbour != maze.dest:
+					maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].draw(screen,visited_cell_color)
+				else:
+					maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].draw(screen,(255,255,255))
+				
+				maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].visited=True
+				maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].dist  = maze.grid[ current_cell[ 0 ] ][ current_cell[ 1 ] ].dist+1
+				maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].parent=current_cell
+				q.append(neighbour)
+				if current_cell != maze.src :#maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].parent
+					maze.grid[ neighbour[ 0 ] ][ neighbour[ 1 ] ].draw(screen, (99, 163, 184 ))	
+				
+			if ( isvalid( neighbour )  and neighbour==maze.dest ):
+				return True	
+	return False			
+def print_shortest_path(maze):
+	if( not BFS(maze) ):
+		print("NO PATH EXIST BETWEEN  YOUR CHOSEN SOURCE AND DSETINATION")
+		return 
+	dest=maze.dest
+	print(" PATH EXIST BETWEEN  YOUR CHOSEN SOURCE AND DSETINATION")
+	while	maze.grid[ dest[0] ] [ dest[1] ].parent !=  (-1,-1)	:	
+		maze.grid [ dest[0] ] [ dest[1] ].draw(screen,[255,255,255])
+		dest=maze.grid [ dest[0] ] [ dest[1] ].parent
 
 #pygame.display.update()
 #pygame.display.update(50  ,  50  ,   MAZE.xcount*MAZE.cell_size  , MAZE.ycount*MAZE.cell_size)
-pressed=False
-wall=[]
+
 
 operation=0
 while True :
@@ -99,7 +154,7 @@ while True :
 								MAZE.grid[ i[0] ] [ i[1] ].is_src=True
 								MAZE.source_set=True
 								MAZE.src=(i[0],i[1])
-								print(MAZE.src,"\nsrc_set?",MAZE.source_set)
+								#print(MAZE.src,"\nsrc_set?",MAZE.source_set)
 								wall.pop()
 								operation=0
 								break
@@ -111,7 +166,7 @@ while True :
 								MAZE.grid[ i[0] ] [ i[1] ].is_dest=True
 								MAZE.dest_set=True
 								MAZE.dest=(i[0],i[1])
-								print(MAZE.dest, "\ndest_set?",MAZE.dest_set)
+								#print(MAZE.dest, "\ndest_set?",MAZE.dest_set)
 								wall.pop()
 								operation=0
 								break
@@ -123,8 +178,7 @@ while True :
 				operation=0					
 								
 							
-	for event in pygame.event.get():
-			
+	for event in pygame.event.get():		
 			if event.type==pygame.QUIT:
 				run=False
 				pygame.quit()	
@@ -145,8 +199,11 @@ while True :
 				elif event.key==pygame.K_6: 	
 					operation=6
 					#print("reset_src")
-					
-						
+				elif event.key==pygame.K_1:
+					operation=0
+					print_shortest_path(MAZE)
+				elif event.key==pygame.K_9:
+					reset()	
 			if event.type==pygame.MOUSEBUTTONDOWN:
 				pressed=True
 				if event.button==1:
