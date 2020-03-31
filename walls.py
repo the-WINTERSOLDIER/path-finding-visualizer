@@ -2,7 +2,7 @@ import pygame
 import sys
 from collections import deque #used for queue
 pygame.init()
-
+FPS=90
 class cell (object):
 	def __init__(self,cell_size,color,pos):
 		self.cell_size=cell_size
@@ -40,19 +40,22 @@ class Grid (object):
 	src=(0,0)
 	erectwall=False #flsg that allows to to build wall
 	breakwall=False#flag that allows to break walls
+	enablediagonalneighbour=False
 	
-	def __init__(self,rows,cols,cell_size,x,y,color=[71,0,156]):
+	def __init__(self,rows,cols,cell_size,x,y,diag_neighbour,color=[71,0,156]):
 		self.xcount=rows
 		self.ycount=cols
 		self.cell_size=cell_size
 		self.pos=(x,y)
 		self.cell_color=color
 		self.grid=[]
+		self.enablediagonalneighbour=diag_neighbour
 		for i in range(0, self.xcount):
 			self.grid.append([])
 			for j in range (0,self.ycount):
 				self.grid[i].append(cell(self.cell_size,     self.cell_color ,     (50+i*self.cell_size ,50+j*self.cell_size )))
-				self.grid[i][j].draw(screen)	
+				self.grid[i][j].draw(screen)
+				
 	def resetsrc(self):
 		#print(self.src,"\nsrc_set?",self.source_set)
 		self.source_set=False
@@ -70,6 +73,7 @@ class Grid (object):
 		self.resetdest()
 		self.erectwall=False
 		self.breakwall=False
+		self.enablediagonalneighbour=False
 		for i in range( self.xcount):
 			for j in range (self.ycount):
 				self.grid[i][j].resetcell(screen)		
@@ -80,10 +84,14 @@ def isvalid(cell_coord,maze):
 	if(cell_coord [  0 ]  >= 0 and cell_coord [  0 ]  < 50 and cell_coord [ 1 ] >=0 and cell_coord [  1 ]  <50 and not maze.grid[ cell_coord [  0 ]   ][ cell_coord [  1  ]   ].is_wall):
 		return True
 	return False
+	
+	
 def setfps(x):
 	global_var= globals()
 	global_var["FPS"]=x
-	#print "fps set to ",x	
+	print "fps set to ",x,global_var["FPS"]
+	
+		
 def BFS(maze):
 	maze.grid [ maze.src[0] ] [ maze.src[1] ].dist=0
 	maze.grid [ maze.src[0] ] [ maze.src[1] ].visited=True #set the SOURCE  CELL  as VISITED
@@ -94,7 +102,10 @@ def BFS(maze):
 	q=deque() #queue maintains the vertices whose adjacent vertives are yet to be explored
 	q.append(maze.src)
 	
-	adj=[(0,-1),(1,0),(0,1),(-1,0)] 
+	if maze.enablediagonalneighbour== False:
+		adj=[(0,-1),(1,0),(0,1),(-1,0)] 
+	else :
+		adj=[(0,-1),(1,-1),(1,0),(1,1),(0,1),(-1,1),(-1,0)]
 	while(len(q)!=0):
 		current_cell=q.popleft();
 		t=pygame.time.Clock()
@@ -132,8 +143,9 @@ def print_shortest_path(maze):
 #pygame.display.update()
 #pygame.display.update(50  ,  50  ,   MAZE.xcount*MAZE.cell_size  , MAZE.ycount*MAZE.cell_size)
 
-def mainloop(screen,wall):
-	MAZE=Grid(50,50,14,50,50)
+def mainloop(screen,wall,diag_traversal):
+	MAZE=Grid(50,50,14,50,50,diag_traversal)
+	
 	operation=0
 	pressed=False
 	while True :
@@ -227,11 +239,17 @@ def mainloop(screen,wall):
 					pressed=False	
 		
 if __name__ == "__main__":
-	    print "Arguments count:","\n" , len(sys.argv)
-	    for  arg in enumerate  (sys.argv):
+	#print "Arguments count:","\n" , len(sys.argv)
+	#CONSTANCS USED IN MAZE_GEN
+	screen_size=(WIDTH,HEIGHT)=(800,800)
+	BGCOLOUR=( 255 , 255 , 255)
+	rekt=(50,50,WIDTH-100,HEIGHT-100)
+	wall=[]
+	diag_traversal=False
+	for  arg in enumerate  (sys.argv):
 		#print "Argument  ", arg[0] , arg[1]
-		if len(sys.argv)==1 or (arg[1]=="--help" or arg[1]=="-h"):
-				print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAZE~SOLVER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+		if len(sys.argv)==1 or (sys.argv[1]=="--help" or sys.argv[1]=="-h"):
+				print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAZE~SOLVER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
 				print"[usage]: python walls.py -fps <integer between 10-100> -d <enables diagonal cell traversal | DONOT specify this flag is you donot want diagonal traversal> \n\n\tYOU CANNOT SET ANY FLAG WHILE THE PROGRAM IS SOLVING THE MAZE\n\n"
 				print"[press 1]-to start solving the maze"
 				print"[press 2] - manually draw Walls with mouse \t(press and hold left mouse button , then drag)"
@@ -243,25 +261,22 @@ if __name__ == "__main__":
 				pygame.quit()
 				quit()
 		else:
-			#CONSTANCS USED IN MAZE_GEN
-			screen_size=(WIDTH,HEIGHT)=(800,800)
-			BGCOLOUR=( 255 , 255 , 255)
-
-
-			#SETTING UP THE SCREEN
-			screen=pygame.display.set_mode(screen_size)
-			rekt=(50,50,WIDTH-100,HEIGHT-100)
-			FPS=90#frasmes per second 
-
-			screen.fill((255,255,255))#white color of the screen
-			screen.fill((71, 0, 156),rekt)#voilet cor of the screeen
-			wall=[]
-
-			pygame.display.update()
-			#_________________________________________________________
 			if( arg[1]=="-fps"):
 				#print( sys.argv[ int(arg[0] +1) ])
 				setfps(int(sys.argv[ int(arg[0] +1)]))
+			if( arg[1]=="-d"):
+				#print( sys.argv[ int(arg[0] +1) ])
+				diag_traversal=True					
+	
+
+	#SETTING UP THE SCREEN
+	screen=pygame.display.set_mode(screen_size)
+
+	screen.fill((255,255,255))#white color of the screen
+	screen.fill((71, 0, 156),rekt)#voilet cor of the screeen
+	pygame.display.update()
+	#_________________________________________________________
+			
 				
-            		mainloop(screen,wall)   
+        mainloop(screen,wall,diag_traversal)   
 
