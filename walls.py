@@ -2,24 +2,7 @@ import pygame
 import sys
 from collections import deque #used for queue
 pygame.init()
-#--------------------------------------------
 
-#CONSTANCS USED IN MAZE_GEN
-screen_size=(WIDTH,HEIGHT)=(800,800)
-BGCOLOUR=( 255 , 255 , 255)
-
-
-#SETTING UP THE SCREEN
-screen=pygame.display.set_mode(screen_size)
-rekt=(50,50,WIDTH-100,HEIGHT-100)
-FPS=90#frasmes per second 
-
-screen.fill((255,255,255))#white color of the screen
-screen.fill((71, 0, 156),rekt)#voilet cor of the screeen
-
-wall=[]
-pygame.display.update()
-#_________________________________________________________
 class cell (object):
 	def __init__(self,cell_size,color,pos):
 		self.cell_size=cell_size
@@ -73,13 +56,15 @@ class Grid (object):
 	def resetsrc(self):
 		#print(self.src,"\nsrc_set?",self.source_set)
 		self.source_set=False
-		self.grid [ self.src[0] ] [ self.src[1] ].draw(screen)
-		self.src=(0,0)
+		self.grid[ self.src[0] ] [ self.src[1] ].resetcell(screen)
+		#self.grid [ self.src[0] ] [ self.src[1] ].draw(screen)
+		#self.src=(0,0)
 	def resetdest(self):
 		#print(self.dest,"\nsrc_set?",self.dest_set)
 		self.dest_set=False
-		self.grid [ self.dest[0] ] [ self.dest[1] ].draw(screen)
-		self.dest=(0,0)
+		self.grid[ self.src[0] ] [ self.src[1] ].resetcell(screen)
+		#self.grid [ self.dest[0] ] [ self.dest[1] ].draw(screen)
+		#self.dest=(0,0)
 	def reset(self,screen):
 		self.resetsrc()
 		self.resetdest()
@@ -98,7 +83,7 @@ def isvalid(cell_coord,maze):
 def setfps(x):
 	global_var= globals()
 	global_var["FPS"]=x
-	print("fps set to ",x)	
+	#print "fps set to ",x	
 def BFS(maze):
 	maze.grid [ maze.src[0] ] [ maze.src[1] ].dist=0
 	maze.grid [ maze.src[0] ] [ maze.src[1] ].visited=True #set the SOURCE  CELL  as VISITED
@@ -147,7 +132,7 @@ def print_shortest_path(maze):
 #pygame.display.update()
 #pygame.display.update(50  ,  50  ,   MAZE.xcount*MAZE.cell_size  , MAZE.ycount*MAZE.cell_size)
 
-def mainloop():
+def mainloop(screen,wall):
 	MAZE=Grid(50,50,14,50,50)
 	operation=0
 	pressed=False
@@ -242,11 +227,41 @@ def mainloop():
 					pressed=False	
 		
 if __name__ == "__main__":
-	    print("Arguments count:", {len(sys.argv)})
+	    print "Arguments count:","\n" , len(sys.argv)
 	    for  arg in enumerate  (sys.argv):
-		print("Argument  ",arg[0],"=",arg[1])
-		if( arg[1]=="-fps"):
-			#print( sys.argv[ int(arg[0] +1) ])
-			setfps(int(sys.argv[ int(arg[0] +1)]))
-            mainloop()   
+		#print "Argument  ", arg[0] , arg[1]
+		if len(sys.argv)==1 or (arg[1]=="--help" or arg[1]=="-h"):
+				print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAZE~SOLVER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+				print"[usage]: python walls.py -fps <integer between 10-100> -d <enables diagonal cell traversal | DONOT specify this flag is you donot want diagonal traversal> \n\n\tYOU CANNOT SET ANY FLAG WHILE THE PROGRAM IS SOLVING THE MAZE\n\n"
+				print"[press 1]-to start solving the maze"
+				print"[press 2] - manually draw Walls with mouse \t(press and hold left mouse button , then drag)"
+				print"[press 3]- to set the starting point "
+				print"[press 4]- to set destination"
+				print"[press 5]-to reset the starting point"
+				print"[press 6]-to reset the neding point"
+				print"[press 9]-to reset the maze"
+				pygame.quit()
+				quit()
+		else:
+			#CONSTANCS USED IN MAZE_GEN
+			screen_size=(WIDTH,HEIGHT)=(800,800)
+			BGCOLOUR=( 255 , 255 , 255)
+
+
+			#SETTING UP THE SCREEN
+			screen=pygame.display.set_mode(screen_size)
+			rekt=(50,50,WIDTH-100,HEIGHT-100)
+			FPS=90#frasmes per second 
+
+			screen.fill((255,255,255))#white color of the screen
+			screen.fill((71, 0, 156),rekt)#voilet cor of the screeen
+			wall=[]
+
+			pygame.display.update()
+			#_________________________________________________________
+			if( arg[1]=="-fps"):
+				#print( sys.argv[ int(arg[0] +1) ])
+				setfps(int(sys.argv[ int(arg[0] +1)]))
+				
+            		mainloop(screen,wall)   
 
