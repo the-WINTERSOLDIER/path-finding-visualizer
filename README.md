@@ -32,5 +32,6 @@
   ![maze](https://user-images.githubusercontent.com/29229288/77899081-d0640500-7299-11ea-81ec-9df74f7b87f6.png)
    
   ![path](https://user-images.githubusercontent.com/29229288/77899179-f8536880-7299-11ea-9bac-91a3815e0044.png)
-
+  
+  ![DIAGONAL TRAVERSAL](https://user-images.githubusercontent.com/29229288/78140746-1b237f80-7448-11ea-8cbc-0090bb2dd094.png)
 
